@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60)
@@ -8,20 +8,30 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs}`;
 }
 
-function Timer() {
-  const [isRunning, setIsRunning] = useState(false);
+type TimerProps = {
+  /**
+   * Callback to run when the counter reaches zero
+   */
+  onFinish?: () => void;
+};
+
+function Timer({ onFinish }: TimerProps) {
   const [remaining, setRemaining] = useState(5 * 60);
-  const timerRef = useRef();
+  const timerRef = useRef<number | null>(null);
 
-  const stop = () => {
-    clearInterval(timerRef.current);
+  const stop = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     timerRef.current = null;
-    setIsRunning(false);
-  };
+  }, []);
 
-  const handleReset = () => setRemaining(5 * 60);
+  useEffect(() => {
+    return () => stop();
+  }, [stop]);
+
   const handleStart = () => {
-    if (isRunning) {
+    if (timerRef.current !== null) {
       return;
     }
 
@@ -30,11 +40,12 @@ function Timer() {
         setRemaining((s) => s - 1);
       } else {
         stop();
+        onFinish?.();
       }
     }, 1000);
-    setIsRunning(true);
   };
   const handleStop = () => stop();
+  const handleReset = () => setRemaining(5 * 60);
 
   return (
     <>
