@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { Provider } from 'react-redux';
+import { reset, store, tick, useAppDispatch, useAppSelector } from './store';
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60)
@@ -15,9 +17,10 @@ type TimerProps = {
   onFinish?: () => void;
 };
 
-function Timer({ onFinish }: TimerProps) {
-  const [remaining, setRemaining] = useState(5 * 60);
+function TimerInner({ onFinish }: TimerProps) {
   const timerRef = useRef<number | null>(null);
+  const remaining = useAppSelector((state) => state.counter.value);
+  const dispatch = useAppDispatch();
 
   const stop = useCallback(() => {
     if (timerRef.current) {
@@ -37,7 +40,7 @@ function Timer({ onFinish }: TimerProps) {
 
     timerRef.current = setInterval(() => {
       if (remaining > 0) {
-        setRemaining((s) => s - 1);
+        dispatch(tick());
       } else {
         stop();
         onFinish?.();
@@ -45,7 +48,7 @@ function Timer({ onFinish }: TimerProps) {
     }, 1000);
   };
   const handleStop = () => stop();
-  const handleReset = () => setRemaining(5 * 60);
+  const handleReset = () => dispatch(reset(5 * 60));
 
   return (
     <>
@@ -62,6 +65,14 @@ function Timer({ onFinish }: TimerProps) {
       </div>
       <div style={{ textAlign: 'center' }}>{formatTime(remaining)}</div>
     </>
+  );
+}
+
+function Timer({ onFinish }: TimerProps) {
+  return (
+    <Provider store={store}>
+      <TimerInner onFinish={onFinish} />
+    </Provider>
   );
 }
 
