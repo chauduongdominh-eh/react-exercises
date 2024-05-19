@@ -1,6 +1,7 @@
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { Timer } from '../timer';
 import { MainLayout } from './MainLayout';
+import { MovieSearch } from '../movie-search';
 
 const router = createBrowserRouter([
   {
@@ -8,6 +9,7 @@ const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { path: '/timer', element: <Timer /> },
+      { path: '/movieSearch', element: <MovieSearch /> },
     ],
   },
 ]);

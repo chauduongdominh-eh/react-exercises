@@ -8,6 +8,9 @@ function MainLayout() {
           <li>
             <NavLink to={'/timer'}>Timer</NavLink>
           </li>
+          <li>
+            <NavLink to={'/movieSearch'}>Movie Search</NavLink>
+          </li>
         </ul>
       </nav>
       <main>
